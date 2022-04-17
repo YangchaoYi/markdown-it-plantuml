@@ -46,4 +46,20 @@ describe('markdown-it-plantuml', function () {
     { header: true },
     parserWithCustomServer
   );
+
+  var parserWithCustomRender = md().use(plantuml, {
+    render: function (tokens, idx, options, env, slf) {
+              var fetch = require('sync-fetch');
+              var token = tokens[idx];
+              console.log(token.attrs[token.attrIndex('src')][1]);
+              var raw = fetch(token.attrs[token.attrIndex('src')][1]);
+              return raw.text().replace(/\r\n/g, "\n") + '\n';
+            }
+  });
+
+  generate(
+    path.join(__dirname, 'fixtures/render.txt'),
+    { header: true },
+    parserWithCustomRender
+  );
 });
